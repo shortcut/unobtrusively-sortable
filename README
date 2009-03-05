@@ -3,7 +3,7 @@ Unobtrusively Sortable
 
 Create sortable lists in Rails with minimal configuration. The lists will be sortable with javascript disabled. jQuery awesomeness will be applied if javascript is enabled.
 
-The plugin assumes that you are using the newest version of acts_as_list (TODO: Insert more about commit SHA and what not when the patch has been accepted)
+The plugin assumes that you are using the newest version of acts_as_list (TODO: Insert more about commit SHA and what not when the patch has been accepted. http://rails.lighthouseapp.com/projects/8995/tickets/55-storing-the-configuration-options-in-acts_as_list)
 
 
 Copyright (c) 2009 August Lilleaas, released under the MIT license
