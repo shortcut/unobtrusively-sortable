@@ -5,5 +5,33 @@ Create sortable lists in Rails with minimal configuration. The lists will be sor
 
 The plugin assumes that you are using the newest version of acts_as_list (TODO: Insert more about commit SHA and what not when the patch has been accepted. http://rails.lighthouseapp.com/projects/8995/tickets/55-storing-the-configuration-options-in-acts_as_list)
 
+The plugin also assumes you are using jQuery and jQuery UI. Your jQuery UI must have the "sortable" package.
+
+
+Usage and installation
+======================
+
+* Install the plugin
+* Run `rake unobtrusively_sortable:copy_javascripts`
+* In routes.rb, do something like this:
+
+   map.resources :posts, :collection => {:sort => :post}
+   
+* In the controller, do something like this:
+
+   class PostsController < ApplicationController
+     sorts Post
+   end
+
+* Then finally, in a view, use the `unobtrusively_sortable_list` helper to render your awesome unobtrusive sortable list. Do something like this:
+
+   <%= unobtrusively_sortable_list(@posts) {|p| p.title } %>
+
+
+Advanced usage
+==============
+
+You can specify an :url option to the `unobtrusively_sortable_list` helper if you need to use another URL than the assumed default URL. This is useful for namespaces and nested resources.
+
 
 Copyright (c) 2009 August Lilleaas, released under the MIT license
