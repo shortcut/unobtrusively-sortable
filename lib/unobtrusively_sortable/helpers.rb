@@ -4,11 +4,11 @@ module UnobtrusivelySortable
     # Renders the <ul>-list that contains the sortable elements. 'Elements' is
     # an array of ActiveRecord instances.
     def unobtrusively_sortable_list(elements, options = {})
-      options[:url] ||= __send__([:sort, elements.first.class.name.tableize, :path].join("_"))
+      options[:url] ||= !elements.empty? && __send__([:sort, elements.first.class.name.tableize, :path].join("_"))
       
       content_tag(:ul, elements.map {|e|
-        content_tag(:li, sortable_handles(e, options) + yield(e))
-      }.join, :class => "unobtrusively_sortable_list")
+        content_tag(:li, sortable_handles(e, options) + yield(e), :id => dom_id(e))
+      }.join, :class => "unobtrusively_sortable_list", :sort_url => options[:url])
     end
     
     def sortable_handles(e, options)

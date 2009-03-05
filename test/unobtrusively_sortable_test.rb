@@ -5,7 +5,6 @@ ENV["RAILS_ROOT"] = rails_root
  
 require File.join(rails_root, 'config', 'environment')
 require 'test/unit'
-require 'mocha'
 
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :dbfile => ":memory:")
 
@@ -23,21 +22,24 @@ class UnobtrusivelySortableController < ActionController::Base
 end
 
 ActionController::Routing::Routes.draw do |map|
+  map.resources :comments, :collection => {:sort => :post}
   map.connect ":controller/:action/:id"
 end
 
 
 class UnobtrusivelySortableControllerTest < ActionController::TestCase
   def setup
-    ActiveRecord::Schema.define(:version => 1) do
-      create_table :posts do |t|
-        t.string :title
-        t.text :excerpt, :body
-      end
+    silence_stream(STDOUT) do
+      ActiveRecord::Schema.define(:version => 1) do
+        create_table :posts do |t|
+          t.string :title
+          t.text :excerpt, :body
+        end
 
-      create_table :comments do |t|
-        t.text :commment
-        t.integer :position, :post_id
+        create_table :comments do |t|
+          t.text :comment
+          t.integer :position, :post_id
+        end
       end
     end
     
@@ -45,6 +47,8 @@ class UnobtrusivelySortableControllerTest < ActionController::TestCase
     @post = Post.create!
     2.times { @post.comments.create! }
     @comment = @post.comments.create!
+    
+    @view = ActionView::Base.new
   end
 
   def teardown
@@ -85,5 +89,34 @@ class UnobtrusivelySortableControllerTest < ActionController::TestCase
     new_order.each_with_index do |id, index|
       assert_equal id, @post.comments[index].id
     end
+  end
+  
+  def test_unobtrusively_sortable_list_with_empty_collection
+    html = @view.unobtrusively_sortable_list([])
+    assert_html(html, "ul.unobtrusively_sortable_list")
+    assert_no_html(html, "ul li")
+  end
+  
+  def test_unobtrusively_sortable_list
+    @view.expects(:url_for).returns("/foo/bar/baz").at_least_once()
+    @view.expects(:protect_against_forgery?).returns(true).at_least_once()
+    @view.expects(:request_forgery_protection_token).returns("authenticity_token").at_least_once()
+    @view.expects(:form_authenticity_token).returns("aoeui").at_least_once()
+    
+    html = @view.unobtrusively_sortable_list(@post.comments) {|c| "" }
+    assert_html(html, "ul.unobtrusively_sortable_list li form input")
+    # TODO: Improve this test.
+  end
+  
+  def assert_html(html, selector)
+    assert count_nodes(html, selector) > 0
+  end
+  
+  def assert_no_html(html, selector)
+    assert count_nodes(html, selector) == 0
+  end
+  
+  def count_nodes(html, selector)
+    HTML::Selector.new(selector).select(HTML::Document.new(html).root).size
   end
 end
