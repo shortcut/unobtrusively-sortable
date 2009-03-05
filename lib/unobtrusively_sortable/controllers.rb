@@ -9,7 +9,7 @@ module UnobtrusivelySortable
         if params[:id]
           # Increment or decrement a position by 1 step
           scope = model_class.read_inheritable_attribute("acts_as_list_configuration")[:scope] # post_id
-          if scope
+          if scope != "1 = 1" # the default scope. acts_as_list is silly.
             parent = scope.to_s[/^(.+)_id$/, 1].classify.constantize.find(params[scope]) # Post.find(params[:category_id])
             instance = parent.send(model_class.to_s.tableize).find(params[:id]) # post.comments.find(params[:id])
           else
@@ -25,7 +25,11 @@ module UnobtrusivelySortable
           
           redirect_to :back
         else
-          # Increment or decrement a position by 1 or more steps
+          params[model_class.to_s.underscore].each_with_index do |id, position|
+            position += 1
+            model_class.update(id, {:position => position})
+          end
+          render :nothing => true
         end
       }
     end
