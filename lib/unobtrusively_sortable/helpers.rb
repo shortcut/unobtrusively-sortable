@@ -1,4 +1,3 @@
-# coding:utf-8 
 module UnobtrusivelySortable
   module Helpers
     # Renders the <ul>-list that contains the sortable elements. 'Elements' is
@@ -13,9 +12,9 @@ module UnobtrusivelySortable
     
     def sortable_handles(e, options)
       returning("") do |out|
-        out << button_to("↑", options[:url] + "?direction=up&id=#{e.id}") unless e.first?
+        out << button_to("&uarr;", options[:url] + "?direction=up&id=#{e.id}") unless e.first?
         out << " "
-        out << button_to("↓", options[:url] + "?direction=down&id=#{e.id}") unless e.last?
+        out << button_to("&darr;", options[:url] + "?direction=down&id=#{e.id}") unless e.last?
         out << " "
       end
     end
